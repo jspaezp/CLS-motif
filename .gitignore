@@ -4,3 +4,5 @@ ipython/**
 local/**
 __pucache__/**
 venv/**
+ModelOrganisms/**
+regPhos/**
