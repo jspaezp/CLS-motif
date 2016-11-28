@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # takes a database file and a list of uniprot ID's and
-# returns a nested dataframe with the kinases as a column
+# returns a nested DataFrame with the kinases as a column
 # and a data frame of data frames.
 
 
@@ -25,5 +25,8 @@ def get_substrates(db_source, kinase_list):
     assert(len(kinase_list) == len(substrate_list)), \
         "Differing length in lists"
 
-    kin_subs_pairs = dict(zip(kinase_list, substrate_list))
-    return(kin_subs_pairs)
+    kin_subs = pd.DataFrame()
+    kin_subs['kinase'], kin_subs['substrates'] = \
+        kinase_list, substrate_list
+
+    return(kin_subs)
