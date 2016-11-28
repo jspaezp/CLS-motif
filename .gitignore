@@ -1,8 +1,9 @@
 
-install/**
-ipython/**
-local/**
-__pucache__/**
-venv/**
-ModelOrganisms/**
-regPhos/**
+install/*
+ipython/*
+local/*
+__pycache__/*
+venv/*
+ModelOrganisms/*
+regPhos/*
+.#*
