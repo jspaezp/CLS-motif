@@ -1,0 +1,164 @@
+
+1. get a known multidrug transporter protein structure
+2. psiblast for it
+3. mine structures of drug complexes and multidrug transporter proteins in pdb
+4. get ligands
+5. query rosetta aggainst them
+6. prepare the structures for prediction of binding
+7. autodock the hell out of that thing
+8. get the coefficients of the resulting bindings
+9. plot the indexes and see whether they cluster by chemical functional group
+
+* Phosphomotif Finder
+
+** Query known phosphorilation sites from db
+
+#+BEGIN_SRC python
+import pandas as pd
+
+print("")
+dataset = pd.rea
+#+END_SRC
+** Convert know sites to motifs/ query if multiple motif enrichments
+** Query PWM to database
+   #+BEGIN_SRC python :results output
+   print("Hello World")
+   #+END_SRC
+
+   #+RESULTS:
+   : Hello World
+
+
+** Report sites and proteins in the database
+
+
+* Python Skills
+
+** Generator Usage
+
+** Motifs in biopython
+
+*** Generation
+
+#+BEGIN_SRC python :results output
+from Bio.Seq import Seq
+
+instances = [
+    Seq("TACAA"),
+    Seq("TACGC"),
+    Seq("TACAC"),
+    Seq("TACCC"),
+    Seq("AACCC"),
+    Seq("AATGC"),
+    Seq("AATGC")
+]
+
+print(instances)
+
+from Bio import motifs
+
+mot = motifs.create(instances)
+
+print(mot)
+print(mot.counts) # prints counts for each letter in alphabet
+print(mot.counts['A']) # Prints the counts of A in each line
+print(mot.counts['A', 0]) # Prints count of A in posotion 0
+print(mot.counts[:, 0]) # prints at position 0 the count for each letter
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[Seq('TACAA', Alphabet()), Seq('TACGC', Alphabet()), Seq('TACAC', Alphabet()), Seq('TACCC', Alphabet()), Seq('AACCC', Alphabet()), Seq('AATGC', Alphabet()), Seq('AATGC', Alphabet())]
+TACAA
+TACGC
+TACAC
+TACCC
+AACCC
+AATGC
+AATGC
+
+        0      1      2      3      4
+A:   3.00   7.00   0.00   2.00   1.00
+C:   0.00   0.00   5.00   2.00   6.00
+G:   0.00   0.00   0.00   3.00   0.00
+T:   4.00   0.00   2.00   0.00   0.00
+
+[3, 7, 0, 2, 1]
+3
+{'G': 0, 'C': 0, 'A': 3, 'T': 4}
+#+end_example
+
+*** Query
+
+
+** Pandas dataFrames
+
+#+BEGIN_SRC python :results output
+
+import pandas as pd
+
+df = pd.DataFrame(
+    {
+        'A' : [3,4,5],
+        'B' : [pd.DataFrame({"A" : [6,7,8]}),
+             pd.DataFrame({"B" : [7,9,0]}),
+             pd.DataFrame({"C" : [4,67,8]})
+             ]
+    }
+)
+
+print(df)
+
+print("==================================")
+
+print(df['A'])
+print(df['B'])
+
+print("==================================")
+print(df['B'][0])
+print(df['B'][1])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+   A                        B
+0  3         A
+0  6
+1  7
+2  8
+1  4         B
+0  7
+1  9
+2  0
+2  5      C
+0   4
+1  67
+2   8
+==================================
+0    3
+1    4
+2    5
+Name: A, dtype: int64
+0           A
+0  6
+1  7
+2  8
+1           B
+0  7
+1  9
+2  0
+2        C
+0   4
+1  67
+2   8
+Name: B, dtype: object
+==================================
+   A
+0  6
+1  7
+2  8
+   B
+0  7
+1  9
+2  0
+#+end_example
