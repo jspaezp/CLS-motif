@@ -2,7 +2,7 @@
 install/*
 ipython/*
 local/*
-__pycache__/*
+_*
 venv/*
 ModelOrganisms/*
 regPhos/*
