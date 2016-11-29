@@ -1,7 +1,9 @@
 install/
+3.5.2/
 ipython/
 local/
 __pycache__/
+.ipynb_checkpoints/
 venv/
 ModelOrganisms/
 regPhos/
