@@ -38,5 +38,4 @@ def calculate_alignment_scores(pssm, sequence):
     n = len(sequence)
 
     scores = _calculate_alignment_scores(pssm, sequence, m, n)
-
     return scores

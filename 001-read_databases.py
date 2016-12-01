@@ -32,7 +32,7 @@ for i in (my_substrates['substrates'].tolist()):
             i['AC'],
             i['position']))
 
-my_motifs = [[] if len(window['window'])==0 else
+my_motifs = [[] if len(window['window']) == 0 else
              motifs.create(window['window']) for
              window in my_windows]
 
