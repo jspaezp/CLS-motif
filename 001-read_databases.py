@@ -14,13 +14,13 @@ my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt", "CMGC")
 my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt", my_kinases)
 
 fasta_db = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
-                       "fasta", IUPAC.protein)
+                       "fasta", IUPAC.extended_protein)
 
 my_windows = []
 
 for i in (my_substrates['substrates'].tolist()):
     fasta_db = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
-                           "fasta", IUPAC.protein)
+                           "fasta", IUPAC.extended_protein)
     relevant_db = get_relevant_db(fasta_db, i['AC'])
     my_windows.append(
         get_windows(
@@ -28,7 +28,7 @@ for i in (my_substrates['substrates'].tolist()):
             i['AC'],
             i['position']))
 
-# TODO make custom alphabet to include X as a gap value
+#TODO make a motif per central aminoacid ??
 
 my_motifs = [[] if len(window['window']) == 0 else
              motifs.create(window['window']) for
@@ -43,6 +43,9 @@ my_pwm = [[] if (len(m) == 0) else m.counts.normalize(pseudocounts=1) for
 
 my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
            pwm in my_pwm]
+
+# Scoring
+
 
 ##################################################################
 
