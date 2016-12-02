@@ -16,8 +16,7 @@ def get_substrates(db_source, kinase_list):
 
     for kinase in kinase_list:
         substrates = substrate_db[
-            substrate_db['catalytic kinase'].str.contains('^'+kinase)
-        ]
+            substrate_db['catalytic kinase'].str.contains('^'+kinase)]
         substrate_list.append(substrates)
 
     assert(len(kinase_list) == len(substrate_list)), \
