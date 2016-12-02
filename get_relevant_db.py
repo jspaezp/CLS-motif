@@ -1,13 +1,13 @@
 #!/usr/bin/python
 
-# takes as an input a parser (with .id and .seq attributes)
-# and an iterable set of identifiers
-# and returns a list of entries (in memmory) of the
-# entries that match any of the elements in the set
+import copy
 
 
 def get_relevant_db(parsed_db, identifiers):
-    import copy
+    # takes as an input a parser (with .id and .seq attributes)
+    # and an iterable set of identifiers
+    # and returns a list of entries (in memmory) of the
+    # entries that match any of the elements in the set
 
     relevant_entries = copy.deepcopy(
         [entry for entry in parsed_db if

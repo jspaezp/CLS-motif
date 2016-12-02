@@ -1,11 +1,10 @@
 #!/usr/bin/python
 
-# takes a database file and a list of uniprot ID's and
-# returns a nested DataFrame with the kinases as a column
-# and a data frame of data frames.
-
 
 def get_substrates(db_source, kinase_list):
+    # takes a database file and a list of uniprot ID's and
+    # returns a nested DataFrame with the kinases as a column
+    # and a data frame of data frames.
     import pandas as pd
 
     substrate_db = pd.read_csv(db_source, sep="\t")
@@ -19,7 +18,6 @@ def get_substrates(db_source, kinase_list):
         substrates = substrate_db[
             substrate_db['catalytic kinase'].str.contains('^'+kinase)
         ]
-
         substrate_list.append(substrates)
 
     assert(len(kinase_list) == len(substrate_list)), \
