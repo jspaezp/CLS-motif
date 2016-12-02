@@ -5,6 +5,7 @@
 from reg_phos_reader import get_kinase_group, get_substrates
 from get_windows import get_windows
 from fasta_tools import get_relevant_db
+from calculate_alignment_scores import calculate_alignment_scores
 
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
@@ -46,6 +47,9 @@ my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
 
 # Scoring
 
+my_scores = [[] if (len(pssm) == 0) else
+             calculate_alignment_scores(pssm, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') for
+             pssm in my_pssm]
 
 ##################################################################
 
