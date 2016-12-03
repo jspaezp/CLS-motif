@@ -53,4 +53,3 @@ my_scores = [[] if (len(pssm) == 0) else
 
 ##################################################################
 
-# TODO remove force motif

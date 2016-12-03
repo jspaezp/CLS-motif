@@ -9,6 +9,7 @@
 # It differs from the default implementation in that it dows not have a
 # CPython implementation and it does not exclusively work for DNA sequences
 
+
 def _calculate_alignment_scores(pssm, sequence, m, n):
     sequence = sequence.upper()
     scores = []
@@ -27,7 +28,6 @@ def _calculate_alignment_scores(pssm, sequence, m, n):
 
 def calculate_alignment_scores(pssm, sequence):
     """Returns the PWM score for a given sequence for all positions.
-
     Notes:
 
      - the search is performed only on one strand
