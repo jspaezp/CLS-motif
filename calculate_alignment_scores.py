@@ -69,8 +69,9 @@ def cross_score(pssms, fasta_database, start = None, end = None):
                 score = max(score)
             pssm_scores.append(score)
         DF = pd.DataFrame()
-        DF['scores'] = pssm_scores
-        DF['id'] = [i.id for i in list(fasta_db.values())[start:end]]
+        DF['scores'] = [None if isinstance(i, list) else
+                        float(i) for i in pssm_scores ]
+        DF['id'] = [str(i.id) for i in list(fasta_db.values())[start:end]]
         score_lists.append(DF)
         print('motif', i, 'of', len(pssms))
         i += 1

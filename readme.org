@@ -1,76 +1,50 @@
 
 * README
+** Description of the project
 
-** Usage example
 
-#+BEGIN_SRC python :session :result output
-from get_kinase_group import get_kinase_group
-from get_substrates import get_substrates
+** Example workflow
+
+#+BEGIN_SRC  python :session :result output
+# Loading internal modules
+from reg_phos_reader import get_kinase_group, get_substrates
+from calculate_alignment_scores import calculate_alignment_scores, cross_score
 from get_windows import get_windows
-from force_motifs import forcemotif
-from get_relevant_db import get_relevant_db
-import pandas as pd
+from fasta_tools import get_relevant_db
+
+# External dependencies 
 from Bio import SeqIO
-from Bio.Alphabet import generic_protein
 from Bio.Alphabet import IUPAC
-from Bio.Seq import Seq
 from Bio import motifs
 
-my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt", "CMGC")
-my_kinases[0:5]
+import numpy as num
+import matplotlib.pyplot as plt
+import pandas as pd
 
+from ggplot import *
 #+END_SRC
 
 #+RESULTS:
-| CDC2 | CDK2 | CDK3 | CDK10 |
+: <ggplot: (-9223363245802598631)>
 
-#+BEGIN_SRC python :session :result output
-my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt", my_kinases)
-my_substrates.head()
+#+BEGIN_SRC  python :session :result output
+my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt",
+                              "CMGC")
 #+END_SRC
 
-#+RESULTS:
-:               ID      AC  position       description catalytic kinase  \
-: 2715  CDK2_HUMAN  P24941       160  Phosphothreonine             CCRK   
-: 
-:                                               reference            resource  \
-: 2715  1396589;14597612;16325401;17095507;17192257;17...  Swiss-Prot 1010711   
-: 
-:      code  
-: 2715    T  
-
-#+BEGIN_SRC python :session :result output
-my_substrates['kinase'][0:5]
+#+BEGIN_SRC  python :session :result output
+my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
+                               my_kinases)
 #+END_SRC
 
-#+RESULTS:
-: 0     CCRK
-: 1     CDC2
-: 2     CDK2
-: 3     CDK3
-: 4    CDK10
-: Name: kinase, dtype: object
-
-#+BEGIN_SRC python :session :result output
-my_substrates['substrates'][0]
-#+END_SRC
-
-#+RESULTS:
-:               ID      AC  position       description catalytic kinase  \
-: 2715  CDK2_HUMAN  P24941       160  Phosphothreonine             CCRK   
-: 
-:                                               reference            resource  \
-: 2715  1396589;14597612;16325401;17095507;17192257;17...  Swiss-Prot 1010711   
-: 
-:      code  
-: 2715    T  
-
-
-
-#+BEGIN_SRC python :session :result output
+#+BEGIN_SRC  python :session :result output
 fasta_db = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
-                       "fasta", IUPAC.extended_protein)
+                       "fasta",
+                       IUPAC.extended_protein)
+#+END_SRC
 
+
+#+BEGIN_SRC  python :session :result output
 my_windows = []
 
 for i in (my_substrates['substrates'].tolist()):
@@ -82,123 +56,61 @@ for i in (my_substrates['substrates'].tolist()):
             relevant_db,
             i['AC'],
             i['position']))
-
 #+END_SRC
 
-#+BEGIN_SRC python :session :result output
-my_windows[2].head()
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-  aminoacid               upstream             downstream  \
-0       (T)  (G, R, A, K, G, S, E)  (P, G, A, T, P, G, S)   
-1       (T)  (G, S, E, T, P, G, A)  (P, G, S, K, I, W, D)   
-2       (T)  (H, G, S, G, W, A, E)  (P, R, T, D, R, G, G)   
-3       (S)  (F, P, P, L, N, S, V)  (P, S, P, L, M, L, L)   
-4       (S)  (P, L, N, S, V, S, P)  (P, L, M, L, L, H, P)   
-
-                                          window  
-0  (G, R, A, K, G, S, E, T, P, G, A, T, P, G, S)  
-1  (G, S, E, T, P, G, A, T, P, G, S, K, I, W, D)  
-2  (H, G, S, G, W, A, E, T, P, R, T, D, R, G, G)  
-3  (F, P, P, L, N, S, V, S, P, S, P, L, M, L, L)  
-4  (P, L, N, S, V, S, P, S, P, L, M, L, L, H, P)  
-#+end_example
-
-#+BEGIN_SRC python :session :result output
-my_motifs = [[] if len(window['window'])==0 else
+#+BEGIN_SRC  python :session :result output
+my_motifs = [[] if len(window['window']) == 0 else
              motifs.create(window['window']) for
              window in my_windows]
-
-my_motifs[2].counts[0:2]
 #+END_SRC
 
-#+RESULTS:
-| A | : | (3 4 4 3 3 6 3 0 0 6 4 2 7 2 3) | B | : | (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0) |
 
-#+BEGIN_SRC python :session :result output
+#+BEGIN_SRC  python :session :result output
 # PWM is acronym for position weight matrices
-
-my_pwm = [[] if (len(m) == 0) else
-          m.counts.normalize(pseudocounts=1) for
+my_pwm = [[] if (len(m) == 0) else m.counts.normalize(pseudocounts=1) for
           m in my_motifs]
-
-my_pwm[2]
 #+END_SRC
 
-#+RESULTS:
-#+begin_example
-        0      1      2      3      4      5      6      7      8      9     10     11     12     13     14
-A:   0.04   0.05   0.05   0.04   0.04   0.07   0.04   0.01   0.01   0.07   0.05   0.03   0.09   0.03   0.04
-B:   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01
-C:   0.02   0.01   0.02   0.04   0.02   0.02   0.03   0.01   0.01   0.02   0.01   0.02   0.01   0.02   0.01
-D:   0.06   0.05   0.03   0.03   0.03   0.02   0.05   0.01   0.01   0.02   0.02   0.06   0.02   0.03   0.10
-E:   0.03   0.04   0.10   0.05   0.05   0.04   0.07   0.01   0.02   0.01   0.04   0.02   0.03   0.05   0.05
-F:   0.02   0.02   0.04   0.01   0.04   0.03   0.03   0.01   0.01   0.03   0.03   0.02   0.01   0.02   0.03
-G:   0.07   0.04   0.04   0.06   0.04   0.07   0.12   0.01   0.02   0.09   0.02   0.05   0.07   0.07   0.06
-H:   0.05   0.02   0.03   0.02   0.03   0.02   0.01   0.01   0.02   0.02   0.04   0.02   0.02   0.04   0.02
-I:   0.04   0.04   0.04   0.04   0.07   0.04   0.03   0.01   0.01   0.03   0.02   0.04   0.06   0.02   0.02
-J:   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01
-K:   0.03   0.05   0.07   0.03   0.02   0.03   0.03   0.01   0.01   0.05   0.23   0.05   0.05   0.09   0.10
-L:   0.10   0.13   0.06   0.05   0.06   0.05   0.12   0.01   0.01   0.09   0.02   0.05   0.12   0.11   0.10
-M:   0.05   0.03   0.01   0.02   0.02   0.02   0.02   0.01   0.01   0.01   0.03   0.03   0.02   0.01   0.02
-N:   0.04   0.02   0.06   0.03   0.06   0.03   0.05   0.01   0.01   0.02   0.02   0.07   0.05   0.01   0.01
-O:   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01
-P:   0.06   0.11   0.07   0.11   0.09   0.16   0.04   0.01   0.70   0.05   0.04   0.05   0.09   0.05   0.04
-Q:   0.02   0.04   0.03   0.04   0.03   0.02   0.03   0.01   0.01   0.04   0.05   0.07   0.03   0.05   0.07
-R:   0.07   0.05   0.03   0.04   0.06   0.06   0.04   0.01   0.01   0.12   0.07   0.06   0.10   0.09   0.04
-S:   0.09   0.13   0.11   0.13   0.06   0.10   0.05   0.47   0.01   0.11   0.09   0.09   0.05   0.06   0.09
-T:   0.03   0.01   0.05   0.05   0.06   0.05   0.06   0.28   0.01   0.06   0.05   0.09   0.04   0.09   0.03
-U:   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01
-V:   0.05   0.05   0.01   0.07   0.09   0.04   0.05   0.01   0.01   0.06   0.05   0.05   0.02   0.05   0.04
-W:   0.01   0.01   0.01   0.02   0.02   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.02   0.02
-X:   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01
-Y:   0.02   0.01   0.04   0.02   0.01   0.02   0.02   0.01   0.01   0.01   0.01   0.02   0.03   0.01   0.03
-Z:   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01   0.01
-#+end_example
 
-#+BEGIN_SRC python :session :result output
-# pssm is acronym for position specific storin matrices
-
-my_pssm = [[] if (len(pwm) == 0) else
-           pwm.log_odds() for
+#+BEGIN_SRC  python :session :result output
+# pssm is acronym for position specific scoring matrices
+my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
            pwm in my_pwm]
-
-my_pssm[2]
 #+END_SRC
 
-#+RESULTS:
-#+begin_example
-        0      1      2      3      4      5      6      7      8      9     10     11     12     13     14
-A:   0.15   0.47   0.47   0.15   0.15   0.95   0.15  -1.85  -1.85   0.95   0.47  -0.27   1.15  -0.27   0.15
-B:  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85
-C:  -0.85  -1.85  -0.85   0.15  -0.85  -0.85  -0.27  -1.85  -1.85  -0.85  -1.85  -0.85  -1.85  -0.85  -1.85
-D:   0.73   0.47  -0.27  -0.27  -0.27  -0.85   0.47  -1.85  -1.85  -0.85  -0.85   0.73  -0.85  -0.27   1.32
-E:  -0.27   0.15   1.32   0.47   0.47   0.15   0.95  -1.85  -0.85  -1.85   0.15  -0.85  -0.27   0.47   0.47
-F:  -0.85  -0.85   0.15  -1.85   0.15  -0.27  -0.27  -1.85  -1.85  -0.27  -0.27  -0.85  -1.85  -0.85  -0.27
-G:   0.95   0.15   0.15   0.73   0.15   0.95   1.61  -1.85  -0.85   1.15  -0.85   0.47   0.95   0.95   0.73
-H:   0.47  -0.85  -0.27  -0.85  -0.27  -0.85  -1.85  -1.85  -0.85  -0.85   0.15  -0.85  -0.85   0.15  -0.85
-I:   0.15   0.15   0.15   0.15   0.95   0.15  -0.27  -1.85  -1.85  -0.27  -0.85   0.15   0.73  -0.85  -0.85
-J:  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85
-K:  -0.27   0.47   0.95  -0.27  -0.85  -0.27  -0.27  -1.85  -1.85   0.47   2.61   0.47   0.47   1.15   1.32
-L:   1.32   1.73   0.73   0.47   0.73   0.47   1.61  -1.85  -1.85   1.15  -0.85   0.47   1.61   1.47   1.32
-M:   0.47  -0.27  -1.85  -0.85  -0.85  -0.85  -0.85  -1.85  -1.85  -1.85  -0.27  -0.27  -0.85  -1.85  -0.85
-N:   0.15  -0.85   0.73  -0.27   0.73  -0.27   0.47  -1.85  -1.85  -0.85  -0.85   0.95   0.47  -1.85  -1.85
-O:  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85
-P:   0.73   1.47   0.95   1.47   1.15   2.05   0.15  -1.85   4.19   0.47   0.15   0.47   1.15   0.47   0.15
-Q:  -0.85   0.15  -0.27   0.15  -0.27  -0.85  -0.27  -1.85  -1.85   0.15   0.47   0.95  -0.27   0.47   0.95
-R:   0.95   0.47  -0.27   0.15   0.73   0.73   0.15  -1.85  -1.85   1.61   0.95   0.73   1.32   1.15   0.15
-S:   1.15   1.73   1.47   1.73   0.73   1.32   0.47   3.61  -1.85   1.47   1.15   1.15   0.47   0.73   1.15
-T:  -0.27  -1.85   0.47   0.47   0.73   0.47   0.73   2.85  -1.85   0.73   0.47   1.15   0.15   1.15  -0.27
-U:  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85
-V:   0.47   0.47  -1.85   0.95   1.15   0.15   0.47  -1.85  -1.85   0.73   0.47   0.47  -0.85   0.47   0.15
-W:  -1.85  -1.85  -1.85  -0.85  -0.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -0.85  -0.85
-X:  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85
-Y:  -0.85  -1.85   0.15  -0.85  -1.85  -0.85  -0.85  -1.85  -1.85  -1.85  -1.85  -0.85  -0.27  -1.85  -0.27
-Z:  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85  -1.85
-#+end_example
+#+BEGIN_SRC  python :session :result output
+# Scoring all elements of a given list
+score_list = cross_score(my_pssm, 
+                         "./ModelOrganisms/UP000000625_83333.fasta",
+                         start=1, end=100)
 
-** TODO list
+# score_list = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta")
+#+END_SRC
 
-- Check whether it is relevant to change the preudocounts to remove the ambiguous aminoacid codes to the addition.
+
+#+BEGIN_SRC  python :session :result output
+# convert to nested data frames
+
+my_data_frame = pd.DataFrame()
+my_data_frame['kinase'] = [None if isinstance(i, list) else
+                           str(i) for i in  my_kinases]
+my_data_frame['matches'] = [None if isinstance(i, list) else
+                           i for i in score_list]
+
+#+END_SRC
+
+
+#+BEGIN_SRC  python :session :result output
+## Merge to a single DataFrame and plot
+
+concat = pd.concat(my_data_frame['matches'].tolist(),
+                   keys = my_data_frame['kinase'])
+concat.reset_index(level=0, inplace=True)
+concat = concat[concat['scores'].notnull()]
+
+ggplot(concat, aes(x = 'scores', color = 'kinase')) + geom_density()
+#plot my_scores histogram to pick out cutoff
+scores_hist=plt.hist(my_scores)
+#+END_SRC
+
+

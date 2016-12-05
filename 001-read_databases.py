@@ -15,6 +15,8 @@ import numpy as num
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from ggplot import *
+
 my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt",
                               "CMGC")
 
@@ -58,12 +60,24 @@ my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
 # Scoring all elements of a given list
 score_list = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta", start=1, end=100)
 
+# score_list = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta")
+
 # convert to nested data frames
 
 my_data_frame = pd.DataFrame()
-my_data_frame['kinase'] = my_kinases
-my_data_frame['matches'] = score_list
+my_data_frame['kinase'] = [None if isinstance(i, list) else
+                           str(i) for i in  my_kinases]
+my_data_frame['matches'] = [None if isinstance(i, list) else
+                           i for i in score_list]
 
+## Concatenation testing
+
+concat = pd.concat(my_data_frame['matches'].tolist(),
+                   keys = my_data_frame['kinase'])
+concat.reset_index(level=0, inplace=True)
+concat = concat[concat['scores'].notnull()]
+
+ggplot(concat, aes(x = 'scores', color = 'kinase')) + geom_density()
 #plot my_scores histogram to pick out cutoff
 scores_hist=plt.hist(my_scores)
 
