@@ -15,9 +15,9 @@ import pandas as pd
 
 my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt",
                               "CMGC")
-
+my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
+                               my_kinases)
 low_memory=False
-
 my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
                                my_kinases)
 
