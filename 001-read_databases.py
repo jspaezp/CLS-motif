@@ -107,10 +107,11 @@ for i in (my_substrates['substrates'].tolist()):
         headerList_ecoli.append(record.id)
         seqList_ecoli.append(str(record.seq))
 
+my_scores_ecoli=[]
 for seq in seqList_ecoli[1:5]:
-    my_scores_ecoli = [[] if (len(pssm) == 0) else
+    my_scores_ecoli.append([[] if (len(pssm) == 0) else
              calculate_alignment_scores(pssm, seq) for
-             pssm in my_pssm]
+             pssm in my_pssm])
 
 headerList_scer=[]
 seqList_scer=[]
@@ -121,10 +122,11 @@ for i in (my_substrates['substrates'].tolist()):
         headerList_scer.append(record.id)
         seqList_scer.append(str(record.seq))
 
+my_scores_scer=[]
 for seq in seqList_scer[1:5]:
-    my_scores_scer = [[] if (len(pssm) == 0) else
+    my_scores_scer.append([[] if (len(pssm) == 0) else
              calculate_alignment_scores(pssm, seq) for
-             pssm in my_pssm]
+             pssm in my_pssm])
 
 # how many cross threshold
 
