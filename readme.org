@@ -2,6 +2,18 @@
 * README
 ** Description of the project
 
+This project attempts to automate the prediction of proshporylation motifs by
+iteratively searching for known kinase substrates, extracting its
+primary-structure motif and calculating their position specific scoring matrix;
+afterwards it calculates the maximum score for all the positions in a given
+database and returns a dataframe object with the data.
+
+Currently employs a locally downloaded regPhos database and queries against
+manually chosen model organisms from the non-redundant uniprot database.
+
+Each of the modules describes its use and the arguments/output of each of the
+functions
+
 
 ** Example workflow
 
