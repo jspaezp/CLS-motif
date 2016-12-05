@@ -1,14 +1,19 @@
 #!/usb/bin/python
 
-# Modified from Bio.motifs.matrix.PositionSpecificScorinMatrix.calculate
-
-# This couple of functions get a position specific scoring matrix
-# (pssm) and a sequence and return a series of scores for the align
-# at each positions of this pssm.
-
+# calculate alignment is based on 
+# the one in Bio.motifs.matrix.PositionSpecificScorinMatrix.calculate
 # It differs from the default implementation in that it dows not have a
 # CPython implementation and it does not exclusively work for DNA sequences
 
+# calculate_alignment_scores uses a position specific scoring matrix
+# (pssm) and a sequence and return a series of scores for the align
+# at each positions of this pssm.
+
+
+from Bio import SeqIO
+from Bio.Alphabet import IUPAC
+from calculate_alignment_scores import calculate_alignment_scores
+import pandas as pd
 
 def _calculate_alignment_scores(pssm, sequence, m, n):
     sequence = sequence.upper()
@@ -39,3 +44,36 @@ def calculate_alignment_scores(pssm, sequence):
 
     scores = _calculate_alignment_scores(pssm, sequence, m, n)
     return scores
+
+
+def cross_score(pssms, fasta_database, start = None, end = None):
+    # takes a fasta database locations and a list of pssm's and
+    # returns list of dataFrames, a data frame of the maximum score
+    # and ids database entries for each of the queried pssms
+
+    fasta_db = SeqIO.to_dict(
+        SeqIO.parse(fasta_database,
+                    "fasta",
+                    IUPAC.extended_protein))
+
+    score_lists = []
+    i = 1
+
+    for pssm in pssms:
+        pssm_scores = []
+        for keys, values in list(fasta_db.items())[start:end]:
+            score = []
+            if len(pssm) == 0:
+                score = []
+            else:
+                score = calculate_alignment_scores(pssm, values.seq)
+                score = max(score)
+            pssm_scores.append(score)
+        DF = pd.DataFrame()
+        DF['scores'] = pssm_scores
+        DF['id'] = [i.id for i in list(fasta_db.values())[start:end]]
+        score_lists.append(DF)
+        print('motif', i, 'of', len(pssms))
+        i += 1
+
+    return(score_lists)
