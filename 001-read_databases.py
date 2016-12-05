@@ -5,6 +5,7 @@
 from reg_phos_reader import get_kinase_group, get_substrates
 from get_windows import get_windows
 from fasta_tools import get_relevant_db
+from cross_score import cross_score
 
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
