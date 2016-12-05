@@ -55,26 +55,52 @@ human_seqList = []
 for i in (my_substrates['substrates'].tolist()):
     fasta_db = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
                            "fasta", IUPAC.extended_protein)
-    relevant_db = get_relevant_db(fasta_db, i['AC'])
-    for record in relevant_db:
+    for record in fasta_db:
         headerList.append(record.id)
         human_seqList.append(str(record.seq))
 
 # Scoring for cutoff
-for seq in human_seqList[1:5]:
+for seq in human_seqList:
     my_scores = [[] if (len(pssm) == 0) else
              calculate_alignment_scores(pssm, seq) for
              pssm in my_pssm]
 
     #plot my_scores histogram to pick out cutoff
 import matplotlib.pyplot as plt
-my_scores_df=pd.DataFrame(my_scores)
-scores_hist=my_scores_df.plot(kind='hist')
-plt.show(scores_hist)
-# TODO iterate over at least two model organizms
+scores_hist=plt.hist(my_scores)
 
+# iterate over models
+headerList_ecoli=[]
+seqList_ecoli=[]
+for i in (my_substrates['substrates'].tolist()):
+    fasta_db = SeqIO.parse("./ModelOrganisms/UP000000625_83333.fasta",
+                           "fasta", IUPAC.extended_protein)
+    for record in fasta_db:
+        headerList_ecoli.append(record.id)
+        seqList_ecoli.append(str(record.seq))
+
+for seq in seqList_ecoli[1:5]:
+    my_scores_ecoli = [[] if (len(pssm) == 0) else
+             calculate_alignment_scores(pssm, seq) for
+             pssm in my_pssm]
+
+headerList_scer=[]
+seqList_scer=[]
+for i in (my_substrates['substrates'].tolist()):
+    fasta_db = SeqIO.parse("./ModelOrganisms/UP000002311_559292.fasta",
+                           "fasta", IUPAC.extended_protein)
+    for record in fasta_db:
+        headerList_scer.append(record.id)
+        seqList_scer.append(str(record.seq))
+
+for seq in seqList_scer[1:5]:
+    my_scores_scer = [[] if (len(pssm) == 0) else
+             calculate_alignment_scores(pssm, seq) for
+             pssm in my_pssm]
 
 # how many cross threshold
+
+
 # headers
 ##################################################################
 
