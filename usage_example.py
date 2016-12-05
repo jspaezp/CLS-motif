@@ -5,6 +5,7 @@
 from reg_phos_reader import get_kinase_group, get_substrates
 from get_windows import get_windows
 from fasta_tools import get_relevant_db
+from calculate_alignment_scores import cross_score
 
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
@@ -68,7 +69,7 @@ my_data_frame = pd.DataFrame()
 my_data_frame['kinase'] = [None if isinstance(i, list) else
                            str(i) for i in  my_kinases]
 my_data_frame['matches'] = [None if isinstance(i, list) else
-                           i for i in score_list]
+                           i for i in score_lists]
 
 ## Concatenation testing
 
