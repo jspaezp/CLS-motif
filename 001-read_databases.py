@@ -6,6 +6,7 @@ from reg_phos_reader import get_kinase_group, get_substrates
 from get_windows import get_windows
 from fasta_tools import get_relevant_db
 from calculate_alignment_scores import calculate_alignment_scores
+from cross_score import cross_score
 
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
@@ -50,53 +51,9 @@ my_pwm = [[] if (len(m) == 0) else m.counts.normalize(pseudocounts=1) for
 my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
            pwm in my_pwm]
 
-###############################
-
-fasta_db = SeqIO.to_dict(
-    SeqIO.parse("./ModelOrganisms/UP000000625_83333.fasta",
-                "fasta",
-                IUPAC.extended_protein)
-)
 
 # Scoring all elements of a given list
-
-
-############## FUNCTION VERSION
-
-def cross_score(pssms, fasta_database, start = None, end = None):
-    # takes a fasta database locations and a list of pssm's and
-    # returns list of dataFrames, a data frame of the maximum score
-    # and ids database entries for each of the queried pssms
-    fasta_db = SeqIO.to_dict(
-        SeqIO.parse(fasta_database,
-                    "fasta",
-                    IUPAC.extended_protein))
-
-    score_lists = []
-    i = 1
-
-    for pssm in pssms:
-        pssm_scores = []
-        for keys, values in list(fasta_db.items())[start:end]:
-            score = []
-            if len(pssm) == 0:
-                score = []
-            else:
-                score = calculate_alignment_scores(pssm, values.seq)
-                score = max(score)
-            pssm_scores.append(score)
-        DF = pd.DataFrame()
-        DF['scores'] = pssm_scores
-        DF['id'] = [i.id for i in list(fasta_db.values())[start:end]]
-        score_lists.append(DF)
-        print('motif', i, 'of', len(my_pssm))
-        i += 1
-
-    return(score_lists)
-
-
 test = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta", start=1, end=100)
-############## FUNCTION VERSION END
 
 
 score_lists = []
