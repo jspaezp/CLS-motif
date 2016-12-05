@@ -60,10 +60,11 @@ for i in (my_substrates['substrates'].tolist()):
         human_seqList.append(str(record.seq))
 
 # Scoring for cutoff
+my_scores=[]
 for seq in human_seqList:
-    my_scores = [[] if (len(pssm) == 0) else
+    my_scores.append([[] if (len(pssm) == 0) else
              calculate_alignment_scores(pssm, seq) for
-             pssm in my_pssm]
+             pssm in my_pssm])
 
     #plot my_scores histogram to pick out cutoff
 import matplotlib.pyplot as plt
@@ -79,10 +80,11 @@ for i in (my_substrates['substrates'].tolist()):
         headerList_ecoli.append(record.id)
         seqList_ecoli.append(str(record.seq))
 
+my_scores_ecoli=[]
 for seq in seqList_ecoli[1:5]:
-    my_scores_ecoli = [[] if (len(pssm) == 0) else
+    my_scores_ecoli.append([[] if (len(pssm) == 0) else
              calculate_alignment_scores(pssm, seq) for
-             pssm in my_pssm]
+             pssm in my_pssm])
 
 headerList_scer=[]
 seqList_scer=[]
@@ -93,10 +95,11 @@ for i in (my_substrates['substrates'].tolist()):
         headerList_scer.append(record.id)
         seqList_scer.append(str(record.seq))
 
+my_scores_scer=[]
 for seq in seqList_scer[1:5]:
-    my_scores_scer = [[] if (len(pssm) == 0) else
+    my_scores_scer.append([[] if (len(pssm) == 0) else
              calculate_alignment_scores(pssm, seq) for
-             pssm in my_pssm]
+             pssm in my_pssm])
 
 # how many cross threshold
 
