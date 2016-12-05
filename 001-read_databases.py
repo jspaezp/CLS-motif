@@ -12,6 +12,8 @@ from Bio.Alphabet import IUPAC
 from Bio import motifs
 
 import numpy as num
+import matplotlib.pyplot as plt
+import pandas as pd
 
 my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt", "CMGC")
 low_memory=False
@@ -48,25 +50,51 @@ my_pwm = [[] if (len(m) == 0) else m.counts.normalize(pseudocounts=1) for
 my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
            pwm in my_pwm]
 
-# Plotting to generate cutoff
-headerList=[]
-human_seqList = []
+###############################
 
-for i in (my_substrates['substrates'].tolist()):
-    fasta_db = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
-                           "fasta", IUPAC.extended_protein)
-    for record in fasta_db:
-        headerList.append(record.id)
-        human_seqList.append(str(record.seq))
+fasta_db = SeqIO.to_dict(
+    SeqIO.parse("./ModelOrganisms/UP000000625_83333.fasta",
+                "fasta",
+                IUPAC.extended_protein)
+)
 
-# Scoring for cutoff
-for seq in human_seqList:
-    my_scores = [[] if (len(pssm) == 0) else
-             calculate_alignment_scores(pssm, seq) for
-             pssm in my_pssm]
+# Scoring all elements of a given list
 
-    #plot my_scores histogram to pick out cutoff
-import matplotlib.pyplot as plt
+score_lists = []
+i = 1
+
+for pssm in my_pssm:
+    pssm_scores = []
+    for keys, values in list(fasta_db.items())[1:100]:
+        score = []
+        if len(pssm) == 0:
+            score = []
+        else:
+            score = calculate_alignment_scores(pssm, values.seq)
+            score = max(score)
+        pssm_scores.append(score)
+    DF = pd.DataFrame()
+    DF['scores'] = pssm_scores
+    DF['id'] = list(fasta_db.values())[1:100]
+    score_lists.append(DF)
+    print('motif', i, 'of', len(my_pssm))
+    i += 1
+
+score_lists[0].head()["scores"]
+score_lists[0].head()["id"]
+# convert to nested data frames
+
+my_data_frame = pd.DataFrame()
+
+my_data_frame['kinase'] = my_kinases
+my_data_frame['matches'] = score_lists
+
+
+
+
+
+
+#plot my_scores histogram to pick out cutoff
 scores_hist=plt.hist(my_scores)
 
 # iterate over models
