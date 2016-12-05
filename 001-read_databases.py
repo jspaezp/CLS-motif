@@ -56,14 +56,10 @@ my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
            pwm in my_pwm]
 
 # Scoring all elements of a given list
-<<<<<<< HEAD
 model= "./ModelOrganisms/UP000000625_83333.fasta"
 score_lists=cross_score(my_pssm, model, start=1, end=100)
 score_lists[0].head()["scores"]
 score_lists[0].head()["id"]
-=======
-score_list = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta", start=1, end=100)
->>>>>>> 5a5dfbec62540cc0825f4f9119f4b9f443c410ab
 
 # convert to nested data frames
 
