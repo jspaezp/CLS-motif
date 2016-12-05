@@ -62,10 +62,12 @@ score_list = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta", st
 
 my_data_frame = pd.DataFrame()
 my_data_frame['kinase'] = my_kinases
-my_data_frame['matches'] = score_lists
+my_data_frame['matches'] = score_list
 
 #plot my_scores histogram to pick out cutoff
 scores_hist=plt.hist(my_scores)
+
+
 
 # iterate over models
 headerList_ecoli=[]
