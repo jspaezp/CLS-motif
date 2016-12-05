@@ -5,7 +5,7 @@
 from reg_phos_reader import get_kinase_group, get_substrates
 from get_windows import get_windows
 from fasta_tools import get_relevant_db
-from calculate_alignment_scores import cross_score
+from calculate_alignment_scores import cross_score, cross_score_local
 
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
@@ -17,9 +17,6 @@ from ggplot import *
 
 my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt",
                               "CMGC")
-my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
-                               my_kinases)
-low_memory = False
 my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
                                my_kinases)
 
@@ -69,7 +66,7 @@ my_data_frame['kinase'] = [None if isinstance(i, list) else
 my_data_frame['matches'] = [None if isinstance(i, list) else
                             i for i in score_lists]
 
-# Concatenation testing
+# Concatenation of dataframes
 
 concat = pd.concat(my_data_frame['matches'].tolist(),
                    keys=my_data_frame['kinase'])
@@ -78,3 +75,36 @@ concat = concat[concat['scores'].notnull()]
 
 ggplot(concat, aes(x='scores', color='kinase')) + geom_density()
 
+
+
+
+# Query aggains the original substrate database
+
+fasta_db1 = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
+                        "fasta", IUPAC.extended_protein)
+relevant_db1 = get_relevant_db(fasta_db1,
+                               pd.concat([i['ID'] for
+                                          i in my_substrates['substrates']]))
+
+print(len(relevant_db1))
+relevant_db1 = dict(zip([i.id for i in relevant_db1],
+                        [i for i in relevant_db1]))
+
+score_lists1 = cross_score_local(my_pssm, relevant_db1, end=100)
+
+# convert to nested data frames
+
+my_data_frame1 = pd.DataFrame()
+my_data_frame1['kinase'] = [None if isinstance(i, list) else
+                            str(i) for i in my_kinases]
+my_data_frame1['matches'] = [None if isinstance(i, list) else
+                             i for i in score_lists1]
+
+# Concatenation of dataframes
+
+concat1 = pd.concat(my_data_frame1['matches'].tolist(),
+                    keys=my_data_frame1['kinase'])
+concat1.reset_index(level=0, inplace=True)
+concat1 = concat1[concat1['scores'].notnull()]
+
+ggplot(concat1, aes(x='scores', color='kinase')) + geom_density()

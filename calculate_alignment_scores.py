@@ -14,6 +14,7 @@ from Bio import SeqIO
 from Bio.Alphabet import IUPAC
 import pandas as pd
 
+
 def _calculate_alignment_scores(pssm, sequence, m, n):
     sequence = sequence.upper()
     scores = []
@@ -45,7 +46,7 @@ def calculate_alignment_scores(pssm, sequence):
     return scores
 
 
-def cross_score(pssms, fasta_database, start = None, end = None):
+def cross_score(pssms, fasta_database, start=None, end=None):
     # takes a fasta database locations and a list of pssm's and
     # returns list of dataFrames, a data frame of the maximum score
     # and ids database entries for each of the queried pssms
@@ -70,8 +71,42 @@ def cross_score(pssms, fasta_database, start = None, end = None):
             pssm_scores.append(score)
         DF = pd.DataFrame()
         DF['scores'] = [None if isinstance(i, list) else
-                        float(i) for i in pssm_scores ]
+                        float(i) for i in pssm_scores]
         DF['id'] = [str(i.id) for i in list(fasta_db.values())[start:end]]
+        score_lists.append(DF)
+        print('motif', i, 'of', len(pssms))
+        i += 1
+
+    return(score_lists)
+
+
+def cross_score_local(pssms, local_database, start=None, end=None):
+    # takes a local database locations and a list of pssm's and
+    # returns list of dataFrames, a data frame of the maximum score
+    # and ids database entries for each of the queried pssms
+
+    score_lists = []
+    i = 1
+
+    for pssm in pssms:
+        pssm_scores = []
+        for keys, values in list(local_database.items())[start:end]:
+            score = []
+            if len(pssm) == 0:
+                score = []
+            else:
+                score = calculate_alignment_scores(pssm, values.seq)
+                if (len(score) < 2):
+                    print(score)
+                    score = score
+                else:
+                    score = max(score)
+            pssm_scores.append(score)
+        DF = pd.DataFrame()
+        DF['scores'] = [None if isinstance(i, list) else
+                        float(i) for i in pssm_scores]
+        DF['id'] = [str(i.id) for i in
+                    list(local_database.values())[start:end]]
         score_lists.append(DF)
         print('motif', i, 'of', len(pssms))
         i += 1

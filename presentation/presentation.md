@@ -1,5 +1,5 @@
 
-# Phosphorylation motif finder
+# Phosphorylation motif predictor
 
 ---
 
@@ -43,42 +43,45 @@
 
 ----
 
-#### reg\_phos\_reader.py
+### `reg_phos_reader.py`
 
 Program built from two smaller pandas dependant programs
-- get_kinase_group.py(source, group)
--Takes a database file and group name and returns a \nlist of the kinases that match given group.
+- `get_kinase_group.py(source, group)`
 
-- get_substrates(db_source, kinase_list)
--Takes a database file and a list of uniprot ID's and
+Takes a database file and group name and returns a \nlist of the kinases that match given group.
+
+- `get_substrates(db_source, kinase_list)`
+
+Takes a database file and a list of uniprot ID's and
 returns a nested DataFrame with the kinases as a column
 and a data frame of data frames.
 
 ----
 
-#### get_windows.py
-Three smaller programs built upon each other
-- fill_sequence(sequence, length, fill_right, filler)
-- Fills a string to match a length for instance 'A' for length 5 would be 'AXXXX'
+### `get_windows.py`
 
-- get\_windo_strings(entry, position, length)
-- gets a string, a position and a length,
-    returns the character at given position,
-    and the window up and downstream of given length
+- `fill_sequence(sequence, length, fill_right, filler)`
 
-- get_windows(database, identifiers, positions, fill, length)
-- Generate a list with only the entries that match any of our IDs, INTO MEMMORY!
+Fills a string to match a length for instance 'A' for length 5 would be 'AXXXX'
+
+- `get_windo_strings(entry, position, length)`
+
+gets a string, a position and a length,
+returns the character at given position,
+and the window up and downstream of given length
+
+- `get_windows(database, identifiers, positions, fill, length)`
 
 ----
 
-#### calculate_allignment_scores.py
-Three functions used to calculate the aligment scores and cross score of a sequence
+### `calculate_allignment_scores.py`
 
-- \_calculate\_alignment\_scores(pssm, sequence, m, n)
+Three functions used to calculate the aligment scores for strings and 
+databases for single and multiple pssm's
 
-- calculate\_alignment\_scores(pssm, sequence)
-
-- cross\_score(pssms, fasta_database, start = None, end = None)
+- `_calculate_alignment_scores(pssm, sequence, m, n)`
+- `calculate_alignment_scores(pssm, sequence)`
+- `cross_score(pssms, fasta_database, start = None, end = None)`
 
 ---
 
@@ -86,8 +89,9 @@ Three functions used to calculate the aligment scores and cross score of a seque
 
 ----
 
+### Import all necesarry functions and packages
+
 ```
-import all necesarry functions and packages
 from reg_phos_reader import get_kinase_group, get_substrates
 from get_windows import get_windows
 from fasta_tools import get_relevant_db
@@ -237,6 +241,7 @@ Out[64]:
   0.026595744680851064,
   
   ...
+}  
   
 ```
 
@@ -265,7 +270,8 @@ Out[66]:
   -1.2691866328153893,
   
   ...
-  
+}
+
 ```
 
 
@@ -372,6 +378,11 @@ ggplot(concat, aes(x = 'scores', color = 'kinase'), norm=True) + geom_density()
 ```
 
 ---
+
+![](./ggplot.png)
+
+----
+
 
 ![](./ggplot.png)
 
