@@ -384,6 +384,6 @@ ggplot(concat, aes(x = 'scores', color = 'kinase'), norm=True) + geom_density()
 ----
 
 
-![](./ggplot.png)
+![](./ggplot_self.png)
 
 ----
