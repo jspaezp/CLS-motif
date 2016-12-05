@@ -12,7 +12,6 @@
 
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
-from calculate_alignment_scores import calculate_alignment_scores
 import pandas as pd
 
 def _calculate_alignment_scores(pssm, sequence, m, n):
