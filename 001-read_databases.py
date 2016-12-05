@@ -53,31 +53,11 @@ my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
 
 
 # Scoring all elements of a given list
-test = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta", start=1, end=100)
-
-
-score_lists = []
-i = 1
-
-for pssm in my_pssm:
-    pssm_scores = []
-    for keys, values in list(fasta_db.items())[1:100]:
-        score = []
-        if len(pssm) == 0:
-            score = []
-        else:
-            score = calculate_alignment_scores(pssm, values.seq)
-            score = max(score)
-        pssm_scores.append(score)
-    DF = pd.DataFrame()
-    DF['scores'] = pssm_scores
-    DF['id'] = [i.id for i in list(fasta_db.values())[1:100]]
-    score_lists.append(DF)
-    print('motif', i, 'of', len(my_pssm))
-    i += 1
-
+model= "./ModelOrganisms/UP000000625_83333.fasta"
+score_lists=cross_score(my_pssm, model, start=1, end=100)
 score_lists[0].head()["scores"]
 score_lists[0].head()["id"]
+
 # convert to nested data frames
 
 my_data_frame = pd.DataFrame()
