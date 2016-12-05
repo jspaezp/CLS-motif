@@ -19,7 +19,7 @@ my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt",
                               "CMGC")
 my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
                                my_kinases)
-low_memory=False
+low_memory = False
 my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
                                my_kinases)
 
@@ -39,8 +39,6 @@ for i in (my_substrates['substrates'].tolist()):
             i['AC'],
             i['position']))
 
-#TODO make a motif per central aminoacid ??
-
 my_motifs = [[] if len(window['window']) == 0 else
              motifs.create(window['window']) for
              window in my_windows]
@@ -56,8 +54,8 @@ my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
            pwm in my_pwm]
 
 # Scoring all elements of a given list
-model= "./ModelOrganisms/UP000000625_83333.fasta"
-score_lists=cross_score(my_pssm, model, start=1, end=100)
+model = "./ModelOrganisms/UP000000625_83333.fasta"
+score_lists = cross_score(my_pssm, model, start=1, end=100)
 score_lists[0].head()["scores"]
 score_lists[0].head()["id"]
 
@@ -67,16 +65,16 @@ score_lists[0].head()["id"]
 
 my_data_frame = pd.DataFrame()
 my_data_frame['kinase'] = [None if isinstance(i, list) else
-                           str(i) for i in  my_kinases]
+                           str(i) for i in my_kinases]
 my_data_frame['matches'] = [None if isinstance(i, list) else
-                           i for i in score_lists]
+                            i for i in score_lists]
 
-## Concatenation testing
+# Concatenation testing
 
 concat = pd.concat(my_data_frame['matches'].tolist(),
-                   keys = my_data_frame['kinase'])
+                   keys=my_data_frame['kinase'])
 concat.reset_index(level=0, inplace=True)
 concat = concat[concat['scores'].notnull()]
 
-ggplot(concat, aes(x = 'scores', color = 'kinase')) + geom_density()
+ggplot(concat, aes(x='scores', color='kinase')) + geom_density()
 
