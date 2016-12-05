@@ -60,6 +60,45 @@ fasta_db = SeqIO.to_dict(
 
 # Scoring all elements of a given list
 
+
+############## FUNCTION VERSION
+
+def cross_score(pssms, fasta_database, start = None, end = None):
+    # takes a fasta database locations and a list of pssm's and
+    # returns list of dataFrames, a data frame of the maximum score
+    # and ids database entries for each of the queried pssms
+    fasta_db = SeqIO.to_dict(
+        SeqIO.parse(fasta_database,
+                    "fasta",
+                    IUPAC.extended_protein))
+
+    score_lists = []
+    i = 1
+
+    for pssm in pssms:
+        pssm_scores = []
+        for keys, values in list(fasta_db.items())[start:end]:
+            score = []
+            if len(pssm) == 0:
+                score = []
+            else:
+                score = calculate_alignment_scores(pssm, values.seq)
+                score = max(score)
+            pssm_scores.append(score)
+        DF = pd.DataFrame()
+        DF['scores'] = pssm_scores
+        DF['id'] = [i.id for i in list(fasta_db.values())[start:end]]
+        score_lists.append(DF)
+        print('motif', i, 'of', len(my_pssm))
+        i += 1
+
+    return(score_lists)
+
+
+test = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta", start=1, end=100)
+############## FUNCTION VERSION END
+
+
 score_lists = []
 i = 1
 
@@ -75,7 +114,7 @@ for pssm in my_pssm:
         pssm_scores.append(score)
     DF = pd.DataFrame()
     DF['scores'] = pssm_scores
-    DF['id'] = list(fasta_db.values())[1:100]
+    DF['id'] = [i.id for i in list(fasta_db.values())[1:100]]
     score_lists.append(DF)
     print('motif', i, 'of', len(my_pssm))
     i += 1
@@ -88,9 +127,6 @@ my_data_frame = pd.DataFrame()
 
 my_data_frame['kinase'] = my_kinases
 my_data_frame['matches'] = score_lists
-
-
-
 
 
 
