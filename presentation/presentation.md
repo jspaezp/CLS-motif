@@ -85,7 +85,141 @@ Three functions used to calculate the aligment scores and cross score of a seque
 
 ----
 
-
+## Project Walkthrough
 
 ----
 
+#### usage_example.py
+```
+import all necesarry functions and packages
+from reg_phos_reader import get_kinase_group, get_substrates
+from get_windows import get_windows
+from fasta_tools import get_relevant_db
+from calculate_alignment_scores import cross_score
+
+from Bio import SeqIO
+from Bio.Alphabet import IUPAC
+from Bio import motifs
+
+import pandas as pd
+
+from ggplot import *
+```
+
+----
+````
+my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt",
+                              "CMGC")
+my_kinases[1:10]
+````
+```
+- ['CDC2', 'CDK2', 'CDK3', 'CDK10', 'CDK4', 'CDK6', 'CDK5', 'CDK7', 'CDK8']
+```
+
+----
+````
+my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
+                               my_kinases)
+my_substrates[1:10]
+````
+```
+- kinase                                         substrates
+- 1   CDC2                 ID      AC  position       desc...
+- 2   CDK2                 ID      AC  position       desc...
+- 3   CDK3                ID      AC  position    descript...
+- 4  CDK10  Empty DataFrame
+- Columns: [ID, AC, position, de...
+- 5   CDK4                 ID      AC  position       desc...
+- 6   CDK6                ID      AC  position       descr...
+- 7   CDK5                 ID      AC  position       desc...
+- 8   CDK7                 ID      AC  position       desc...
+- 9   CDK8                ID      AC  position    descript...
+```
+
+----
+````
+my_windows = []
+
+for i in (my_substrates['substrates'].tolist()):
+    fasta_db = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
+                           "fasta", IUPAC.extended_protein)
+    relevant_db = get_relevant_db(fasta_db, i['AC'])
+    my_windows.append(
+        get_windows(
+            relevant_db,
+            i['AC'],
+            i['position']))
+my_windows[1:5]
+````
+```
+- [68 rows x 4 columns],   aminoacid               upstream             downstream  \
+- 0       (S)  (P, G, G, N, I, Y, I)  (P, L, K, S, P, Y, K)   
+- 1       (S)  (I, Y, I, S, P, L, K)  (P, Y, K, I, S, E, G)   
+- 2       (S)  (G, I, L, A, R, R, P)  (Y, R, K, I, L, K, D)   
+- 
+-                                           window  
+- 0  (P, G, G, N, I, Y, I, S, P, L, K, S, P, Y, K)  
+- 1  (I, Y, I, S, P, L, K, S, P, Y, K, I, S, E, G)  
+- 2  (G, I, L, A, R, R, P, S, Y, R, K, I, L, K, D)  , Empty DataFrame
+- Columns: [aminoacid, upstream, downstream, window]
+- Index: []]
+```
+
+----
+````
+my_motifs = [[] if len(window['window']) == 0 else
+             motifs.create(window['window']) for
+             window in my_windows]
+````
+----
+````
+my_pwm = [[] if (len(m) == 0) else m.counts.normalize(pseudocounts=1) for
+          m in my_motifs]
+````
+----
+````
+model= "./ModelOrganisms/UP000000625_83333.fasta"
+
+score_lists=cross_score(my_pssm, model, start=1, end=100)
+
+score_lists[0].head()["scores"]
+````
+```
+- 0    4.183283
+- 1    3.183283
+- 2    4.183283
+- 3    4.183283
+- 4    3.183283
+```
+
+````
+score_lists[0].head()["id"]
+````
+```
+- 0    sp|P10903|NARK_ECOLI
+- 1    sp|P45761|GSPJ_ECOLI
+- 2    sp|P76157|YNFN_ECOLI
+- 3    sp|Q46898|CAS5_ECOLI
+- 4    sp|P16700|CYSP_ECOLI
+```
+----
+````
+my_data_frame = pd.DataFrame()
+my_data_frame['kinase'] = [None if isinstance(i, list) else
+                           str(i) for i in  my_kinases]
+my_data_frame['matches'] = [None if isinstance(i, list) else
+                           i for i in score_lists]
+````
+----
+````
+concat = pd.concat(my_data_frame['matches'].tolist(),
+                   keys = my_data_frame['kinase'])
+concat.reset_index(level=0, inplace=True)
+concat = concat[concat['scores'].notnull()]
+````
+----
+````
+ggplot(concat, aes(x = 'scores', color = 'kinase'), norm=True) + geom_density()
+````
+![](./figure_1.png)
+----

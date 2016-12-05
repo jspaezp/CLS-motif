@@ -78,5 +78,5 @@ concat = pd.concat(my_data_frame['matches'].tolist(),
 concat.reset_index(level=0, inplace=True)
 concat = concat[concat['scores'].notnull()]
 
-ggplot(concat, aes(x = 'scores', color = 'kinase')) + geom_density()
+ggplot(concat, aes(x = 'scores', color = 'kinase'), norm=True) + geom_density()
 
