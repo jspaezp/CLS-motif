@@ -8,4 +8,8 @@ pip install flake8
 pip install autoflake
 pip install hy
 pip install readline
+pip install ggplot
+pip install pandas
+pip install numpy
+pip install matplotlib
 
