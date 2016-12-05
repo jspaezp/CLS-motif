@@ -3,10 +3,9 @@
 # USAGE EXAMPLE
 
 from reg_phos_reader import get_kinase_group, get_substrates
+from calculate_alignment_scores import calculate_alignment_scores, cross_score
 from get_windows import get_windows
 from fasta_tools import get_relevant_db
-from calculate_alignment_scores import calculate_alignment_scores
-from cross_score import cross_score
 
 from Bio import SeqIO
 from Bio.Alphabet import IUPAC
@@ -16,12 +15,17 @@ import numpy as num
 import matplotlib.pyplot as plt
 import pandas as pd
 
-my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt", "CMGC")
+my_kinases = get_kinase_group("./regPhos/RegPhos_kinase_human.txt",
+                              "CMGC")
+
 low_memory=False
-my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt", my_kinases)
+
+my_substrates = get_substrates("./regPhos/RegPhos_Phos_human.txt",
+                               my_kinases)
 
 fasta_db = SeqIO.parse("./ModelOrganisms/UP000005640_9606.fasta",
-                       "fasta", IUPAC.extended_protein)
+                       "fasta",
+                       IUPAC.extended_protein)
 
 my_windows = []
 
@@ -51,24 +55,26 @@ my_pwm = [[] if (len(m) == 0) else m.counts.normalize(pseudocounts=1) for
 my_pssm = [[] if (len(pwm) == 0) else pwm.log_odds() for
            pwm in my_pwm]
 
-
 # Scoring all elements of a given list
+<<<<<<< HEAD
 model= "./ModelOrganisms/UP000000625_83333.fasta"
 score_lists=cross_score(my_pssm, model, start=1, end=100)
 score_lists[0].head()["scores"]
 score_lists[0].head()["id"]
+=======
+score_list = cross_score(my_pssm, "./ModelOrganisms/UP000000625_83333.fasta", start=1, end=100)
+>>>>>>> 5a5dfbec62540cc0825f4f9119f4b9f443c410ab
 
 # convert to nested data frames
 
 my_data_frame = pd.DataFrame()
-
 my_data_frame['kinase'] = my_kinases
-my_data_frame['matches'] = score_lists
-
-
+my_data_frame['matches'] = score_list
 
 #plot my_scores histogram to pick out cutoff
 scores_hist=plt.hist(my_scores)
+
+
 
 # iterate over models
 headerList_ecoli=[]
